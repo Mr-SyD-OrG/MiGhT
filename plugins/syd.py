@@ -92,11 +92,14 @@ syyydtg_map = {
 }
 
 def detect_language(text: str):
+    found = []
+
     for short, full in syyydtg_map.items():
-        # word boundary match, case-insensitive
         if re.search(rf"\b{re.escape(short)}\b", text, re.I):
-            return full
-    return "Unknown"
+            if full not in found:   # ✅ avoid duplicates (e.g. Jap + Jpn)
+                found.append(full)
+
+    return found if found else ["Unknown"]
 
 def clean_title(text: str):
     # remove brackets
@@ -166,12 +169,8 @@ import time
 
 async def new_file(client, file_name: str):
     clean = file_name.replace(".", " ").replace("_", " ").strip()
-    langs = detect_language(clean)
-    langs = "Unknown"
-    for l in langs:
-        if re.search(rf"\b{l}\b", clean, re.I):
-            language = l.title()
-            break
+    langs = detect_language(clean)   
+    language = ", ".join(langs)
 
     # ---------------- ✅ SERIES DETECT ----------------
     s_match = re.search(
