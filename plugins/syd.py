@@ -312,3 +312,15 @@ async def new_file(client, file_name: str):
             "language": language,
             "created_at": int(time.time())
         })
+
+
+@Client.on_message(filters.command("clear_updates") & filters.user(ADMINS))
+async def clear_updates_cmd(client, message):
+    try:
+        result = await db.updates.delete_many({})
+        await message.reply_text(
+            f"✅ All update data cleared!\n\n"
+            f"🗑 Deleted records: `{result.deleted_count}`"
+        )
+    except Exception as e:
+        await message.reply_text(f"❌ Failed to clear data:\n`{e}`")
