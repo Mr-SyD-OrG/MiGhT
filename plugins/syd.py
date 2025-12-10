@@ -37,6 +37,67 @@ def get_file_name(message):
 
     return None
 
+syyydtg_map = {
+    'Eng': 'English', 'English': 'English',
+    'Hin': 'Hindi', 'Hindi': 'Hindi',
+    'Tam': 'Tamil', 'Tamil': 'Tamil',
+    'Tel': 'Telugu', 'Telugu': 'Telugu',
+    'Kan': 'Kannada', 'Kannada': 'Kannada',
+    'Mal': 'Malayalam', 'Malayalam': 'Malayalam',
+    'Mar': 'Marathi', 'Marathi': 'Marathi',
+    'Ben': 'Bengali', 'Bengali': 'Bengali',
+    'Ind': 'Indonesian', 'Indonesian': 'Indonesian',
+    'Pun': 'Punjabi', 'Punjabi': 'Punjabi',
+    'Urd': 'Urdu', 'Urdu': 'Urdu',
+    'Guj': 'Gujarati', 'Gujarati': 'Gujarati',
+    'Bhoj': 'Bhojpuri', 'Bhojpuri': 'Bhojpuri',
+    'Ori': 'Odia', 'Odia': 'Odia',
+    'Ass': 'Assamese', 'Assamese': 'Assamese',
+    'San': 'Sanskrit', 'Sanskrit': 'Sanskrit',
+    'Sin': 'Sinhala', 'Sinhala': 'Sinhala',
+    'Ara': 'Arabic', 'Arabic': 'Arabic',
+    'Fre': 'French', 'French': 'French',
+    'Spa': 'Spanish', 'Spanish': 'Spanish',
+    'Por': 'Portuguese', 'Portuguese': 'Portuguese',
+    'Ger': 'German', 'German': 'German',
+    'Rus': 'Russian', 'Russian': 'Russian',
+    'Jap': 'Japanese', 'Japanese': 'Japanese',
+    'Jpn': 'Japanese',
+    'Kor': 'Korean', 'Korean': 'Korean',
+    'Ita': 'Italian', 'Italian': 'Italian',
+    'Chi': 'Chinese', 'Chinese': 'Chinese',
+    'Man': 'Mandarin', 'Mandarin': 'Mandarin',
+    'Tha': 'Thai', 'Thai': 'Thai',
+    'Vie': 'Vietnamese', 'Vietnamese': 'Vietnamese',
+    'Fil': 'Filipino', 'Filipino': 'Filipino',
+    'Tur': 'Turkish', 'Turkish': 'Turkish',
+    'Swe': 'Swedish', 'Swedish': 'Swedish',
+    'Nor': 'Norwegian', 'Norwegian': 'Norwegian',
+    'Dan': 'Danish', 'Danish': 'Danish',
+    'Pol': 'Polish', 'Polish': 'Polish',
+    'Gre': 'Greek', 'Greek': 'Greek',
+    'Heb': 'Hebrew', 'Hebrew': 'Hebrew',
+    'Cze': 'Czech', 'Czech': 'Czech',
+    'Hun': 'Hungarian', 'Hungarian': 'Hungarian',
+    'Fin': 'Finnish', 'Finnish': 'Finnish',
+    'Ned': 'Dutch', 'Dutch': 'Dutch',
+    'Rom': 'Romanian', 'Romanian': 'Romanian',
+    'Bul': 'Bulgarian', 'Bulgarian': 'Bulgarian',
+    'Ukr': 'Ukrainian', 'Ukrainian': 'Ukrainian',
+    'Cro': 'Croatian', 'Croatian': 'Croatian',
+    'Slv': 'Slovenian', 'Slovenian': 'Slovenian',
+    'Ser': 'Serbian', 'Serbian': 'Serbian',
+    'Afr': 'Afrikaans', 'Afrikaans': 'Afrikaans',
+    'Lat': 'Latin', 'Latin': 'Latin'
+}
+
+def detect_language(text: str):
+    for short, full in syyydtg_map.items():
+        # word boundary match, case-insensitive
+        if re.search(rf"\b{re.escape(short)}\b", text, re.I):
+            return full
+    return "Unknown"
+
 def clean_title(text: str):
     # remove brackets
     text = re.sub(r"\[.*?\]|\(.*?\)", "", text)
@@ -104,11 +165,8 @@ async def auto(bot, message):
 import time
 
 async def new_file(client, file_name: str):
-
     clean = file_name.replace(".", " ").replace("_", " ").strip()
-
-    # ---------------- ✅ LANGUAGE ----------------
-    langs = ["hindi", "english", "tamil", "telugu", "malayalam", "kannada"]
+    language = detect_language(clean)
     language = "Unknown"
     for l in langs:
         if re.search(rf"\b{l}\b", clean, re.I):
@@ -123,7 +181,6 @@ async def new_file(client, file_name: str):
     )
 
     if s_match:
-        # ✅ CLEAN NAME (NO DASH)
         raw_name = s_match.group("name").replace("-", " ")
         name = clean_title(raw_name)
         season = s_match.group("season").zfill(2)
