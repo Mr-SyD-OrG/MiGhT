@@ -37,6 +37,34 @@ def get_file_name(message):
 
     return None
 
+def clean_title(text: str):
+    # remove brackets
+    text = re.sub(r"\[.*?\]|\(.*?\)", "", text)
+
+    # remove quality, platform, codec
+    text = re.sub(
+        r"\b(720p|1080p|2160p|4k|nf|web|webrip|bluray|hdr|x264|x265|hevc|aac)\b",
+        "",
+        text,
+        flags=re.I
+    )
+
+    # remove release groups & tags
+    text = re.sub(
+        r"\b(erai-raws|subsplease|horriblesubs|yts|rarbg|syd)\b",
+        "",
+        text,
+        flags=re.I
+    )
+
+    # remove trailing junk like "-" "_"
+    text = re.sub(r"[-_]+$", "", text)
+
+    # collapse multiple spaces
+    text = re.sub(r"\s{2,}", " ", text)
+
+    return text.strip()
+
 @Client.on_message(filters.document | filters.audio | filters.video)
 async def auto(bot, message):
     # Check if the message is from the specified channel
@@ -93,11 +121,11 @@ async def new_file(client, file_name: str):
     )
 
     if s_match:
-        name = s_match.group("name").strip()
+        name = clean_title(s_match.group("name"))
         season = s_match.group("season").zfill(2)
         ep = int(s_match.group("ep"))
 
-        key = f"{name}_S{season}"
+        key = f"{clean_name.lower()}_s{season}"
 
         prev = await db.get(key)
 
@@ -115,7 +143,7 @@ async def new_file(client, file_name: str):
             txt = (
                 f"{name}\n"
                 f"S{season}E{str(ep).zfill(2)}\n"
-                f"🌐 {language}"
+                f"🔊 {language}"
             )
 
             m = await client.send_message(SYD_UPDATE, txt, reply_markup=button)
@@ -151,7 +179,7 @@ async def new_file(client, file_name: str):
             new_txt = (
                 f"{name} S{season}\n"
                 f"E{str(start).zfill(2)}-E{str(ep).zfill(2)}\n"
-                f"🌐 {language}"
+                f"🔊 {language}"
             )
 
             await client.edit_message_text(
@@ -170,9 +198,8 @@ async def new_file(client, file_name: str):
     m_match = re.search(r"(?P<title>.*?)(19\d{2}|20\d{2})", clean)
 
     if m_match:
-        movie_name = m_match.group(0).strip()
+        movie_name = clean_title(m_match.group(0))
         key = movie_name.lower()
-
         # ✅ Skip if already sent
         if await db.get(key):
             return
@@ -188,7 +215,7 @@ async def new_file(client, file_name: str):
 
         txt = (
             f"{movie_name}\n"
-            f"🌐 {language}"
+            f"🔊 {language}"
         )
 
         await client.send_message(SYD_UPDATE, txt, reply_markup=button)
