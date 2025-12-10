@@ -101,6 +101,8 @@ async def auto(bot, message):
         else:
             logger.warning("Message does not contain media.")
             
+import time
+
 async def new_file(client, file_name: str):
 
     clean = file_name.replace(".", " ").replace("_", " ").strip()
@@ -121,17 +123,26 @@ async def new_file(client, file_name: str):
     )
 
     if s_match:
-        name = clean_title(s_match.group("name"))
+        # ✅ CLEAN NAME (NO DASH)
+        raw_name = s_match.group("name").replace("-", " ")
+        name = clean_title(raw_name)
         season = s_match.group("season").zfill(2)
         ep = int(s_match.group("ep"))
 
-        key = f"{name.lower()}_s{season}"
+        # ✅ CLEAN KEY (NO DASH)
+        key = f"{name.lower().replace('-', '')}_s{season}"
 
         prev = await db.get(key)
 
-        # ✅ FIRST EPISODE → NEW MESSAGE (WITH E01 IN BUTTON)
-        if not prev:
-            search_key = f"{name} S{season}E{str(ep).zfill(2)}".replace(" ", "_")
+        now = int(time.time())
+
+        # ✅ FIRST EPISODE OR FORCED RESEND (LANGUAGE CHANGE)
+        if (
+            not prev or
+            prev.get("language") != language
+        ):
+            search_key = f"{name} S{season}E{str(ep).zfill(2)}"
+            search_key = search_key.replace(" ", "_").replace("-", "")
 
             button = InlineKeyboardMarkup(
                 [[InlineKeyboardButton(
@@ -154,17 +165,22 @@ async def new_file(client, file_name: str):
                 "season": season,
                 "start_ep": ep,
                 "last_ep": ep,
-                "msg_id": m.id
+                "msg_id": m.id,
+                "language": language,
+                "created_at": now
             })
             return
 
-        # ✅ NEXT EPISODES → EDIT MESSAGE (FORMAT CHANGE + REMOVE E01 FROM BUTTON)
+        # ✅ NEXT EPISODES → EDIT ONLY IF < 24 HOURS
         start = prev["start_ep"]
         old_last = prev["last_ep"]
+        created_at = prev.get("created_at", now)
 
         if ep > old_last:
-            # ✅ Button now only to SEASON (not E01)
-            search_key = f"{name} S{season}".replace(" ", "_")
+
+            can_edit = (now - created_at) < 86400   # ✅ 24 HOURS
+
+            search_key = f"{name} S{season}".replace(" ", "_").replace("-", "")
 
             button = InlineKeyboardMarkup(
                 [[InlineKeyboardButton(
@@ -173,23 +189,30 @@ async def new_file(client, file_name: str):
                 )]]
             )
 
-            # ✅ NEW FORMAT YOU ASKED:
-            # Vikings S01
-            # E01-E03
             new_txt = (
                 f"{name} S{season}\n"
                 f"E{str(start).zfill(2)}-E{str(ep).zfill(2)}\n"
                 f"🔊 {language}"
             )
 
-            await client.edit_message_text(
-                SYD_UPDATE,
-                prev["msg_id"],
-                new_txt,
-                reply_markup=button
-            )
+            if can_edit:
+                await client.edit_message_text(
+                    SYD_UPDATE,
+                    prev["msg_id"],
+                    new_txt,
+                    reply_markup=button
+                )
+            else:
+                m = await client.send_message(SYD_UPDATE, new_txt, reply_markup=button)
+                prev["msg_id"] = m.id
+                prev["created_at"] = now
 
-            await db.update(key, {"last_ep": ep})
+            await db.update(key, {
+                "last_ep": ep,
+                "msg_id": prev["msg_id"],
+                "created_at": prev["created_at"],
+                "language": language
+            })
             return
 
         return  # ✅ Duplicate episode ignored
@@ -198,13 +221,18 @@ async def new_file(client, file_name: str):
     m_match = re.search(r"(?P<title>.*?)(19\d{2}|20\d{2})", clean)
 
     if m_match:
-        movie_name = clean_title(m_match.group(0))
-        key = movie_name.lower()
-        # ✅ Skip if already sent
-        if await db.get(key):
+        raw_movie = m_match.group(0).replace("-", " ")
+        movie_name = clean_title(raw_movie)
+
+        key = movie_name.lower().replace("-", "")
+
+        prev = await db.get(key)
+
+        # ✅ RESEND IF LANGUAGE CHANGED
+        if prev and prev.get("language") == language:
             return
 
-        search_key = movie_name.replace(" ", "_")
+        search_key = movie_name.replace(" ", "_").replace("-", "")
 
         button = InlineKeyboardMarkup(
             [[InlineKeyboardButton(
@@ -223,5 +251,7 @@ async def new_file(client, file_name: str):
         await db.save({
             "key": key,
             "type": "movie",
-            "name": movie_name
+            "name": movie_name,
+            "language": language,
+            "created_at": int(time.time())
         })
