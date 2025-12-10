@@ -25,6 +25,18 @@ logger = logging.getLogger(__name__)
 TIMEZONE = "Asia/Kolkata"
 BATCH_FILES = {}
 
+
+def fake_message_from_text(text, chat_id, user_id):
+    return SimpleNamespace(
+        text=text,
+        chat=SimpleNamespace(id=chat_id),
+        from_user=SimpleNamespace(id=user_id),
+        reply=lambda *args, **kwargs: None,
+        reply_text=lambda *args, **kwargs: None,
+        message=SimpleNamespace(reply_to_message=None),
+        id=1
+    )
+
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
     if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
@@ -333,8 +345,8 @@ async def start(client, message):
     elif data.split("-", 1)[0] == "search":
         try:
             name = data.split("-", 1)[1].replace("_", " ")
-            msg = SimpleNamespace(text="sjsjjjs")
-            await auto_filter(client, msg)
+            fake_msg = fake_message_from_text(name, message.chat.id, message.from_user.id)
+            await auto_filter(client, fake_msg)
         except Exception as e:
             await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
 
