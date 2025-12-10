@@ -125,7 +125,7 @@ async def new_file(client, file_name: str):
         season = s_match.group("season").zfill(2)
         ep = int(s_match.group("ep"))
 
-        key = f"{clean_name.lower()}_s{season}"
+        key = f"{name.lower()}_s{season}"
 
         prev = await db.get(key)
 
