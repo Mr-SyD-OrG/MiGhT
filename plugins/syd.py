@@ -67,7 +67,7 @@ async def auto(bot, message):
                     
                 except Exception as e:
                     logger.exception("Failed to save file: %s", e)
-                    await message.reply("An error occurred while processing the file.")
+                    await message.reply(f"An error occurred while processing the file: {e}")
             else:
                 logger.warning("No media found in the message.")
         else:
@@ -99,7 +99,7 @@ async def new_file(client, file_name: str):
 
         key = f"{name}_S{season}"
 
-        prev = await update_db.get(key)
+        prev = await db.get(key)
 
         # ✅ FIRST EPISODE → NEW MESSAGE (WITH E01 IN BUTTON)
         if not prev:
@@ -161,7 +161,7 @@ async def new_file(client, file_name: str):
                 reply_markup=button
             )
 
-            await update_db.update(key, {"last_ep": ep})
+            await db.update(key, {"last_ep": ep})
             return
 
         return  # ✅ Duplicate episode ignored
@@ -174,7 +174,7 @@ async def new_file(client, file_name: str):
         key = movie_name.lower()
 
         # ✅ Skip if already sent
-        if await update_db.get(key):
+        if await db.get(key):
             return
 
         search_key = movie_name.replace(" ", "_")
@@ -193,7 +193,7 @@ async def new_file(client, file_name: str):
 
         await client.send_message(SYD_UPDATE, txt, reply_markup=button)
 
-        await update_db.save({
+        await db.save({
             "key": key,
             "type": "movie",
             "name": movie_name
