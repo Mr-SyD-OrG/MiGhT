@@ -26,16 +26,21 @@ TIMEZONE = "Asia/Kolkata"
 BATCH_FILES = {}
 
 
-def fake_message_from_text(text, chat_id, user_id):
+
+def fake_message_from_text(text, chat_id, user_id, client):
+    async def _reply(*args, **kwargs):
+        return await client.send_message(chat_id, *args, **kwargs)
+
     return SimpleNamespace(
         text=text,
         chat=SimpleNamespace(id=chat_id),
         from_user=SimpleNamespace(id=user_id),
-        reply=lambda *args, **kwargs: None,
-        reply_text=lambda *args, **kwargs: None,
+        reply=_reply,          # ✅ async now
+        reply_text=_reply,     # ✅ async now
         message=SimpleNamespace(reply_to_message=None),
         id=1
     )
+
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
@@ -345,7 +350,7 @@ async def start(client, message):
     elif data.split("-", 1)[0] == "search":
         try:
             name = data.split("-", 1)[1].replace("_", " ")
-            fake_msg = fake_message_from_text(name, message.chat.id, message.from_user.id)
+            fake_msg = fake_message_from_text(name, message.chat.id, message.from_user.id, client)
             await auto_filter(client, fake_msg)
         except Exception as e:
             await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
