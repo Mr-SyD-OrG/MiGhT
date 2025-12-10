@@ -166,8 +166,8 @@ import time
 
 async def new_file(client, file_name: str):
     clean = file_name.replace(".", " ").replace("_", " ").strip()
-    language = detect_language(clean)
-    language = "Unknown"
+    langs = detect_language(clean)
+    langs = "Unknown"
     for l in langs:
         if re.search(rf"\b{l}\b", clean, re.I):
             language = l.title()
