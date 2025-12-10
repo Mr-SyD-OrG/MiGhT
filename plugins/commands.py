@@ -17,6 +17,7 @@ from database.connections_mdb import active_connection
 # from plugins.pm_filter import ENABLE_SHORTLINK
 import re, asyncio, os, sys
 import json
+from types import SimpleNamespace
 import base64
 logger = logging.getLogger(__name__)
 
@@ -327,6 +328,12 @@ async def start(client, message):
                     continue
             await asyncio.sleep(1) 
         return await sts.delete()
+
+    elif data.split("-", 1)[0] == "search":
+        name = data.split("-", 1)[1].replace("_", " ")
+        msg = SimpleNamespace(text="sjsjjjs")
+        await auto_filter(client, msg)
+
 
     elif data.split("-", 1)[0] == "verify":
         userid = data.split("-", 2)[1]
