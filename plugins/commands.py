@@ -331,9 +331,12 @@ async def start(client, message):
         return await sts.delete()
 
     elif data.split("-", 1)[0] == "search":
-        name = data.split("-", 1)[1].replace("_", " ")
-        msg = SimpleNamespace(text="sjsjjjs")
-        await auto_filter(client, msg)
+        try:
+            name = data.split("-", 1)[1].replace("_", " ")
+            msg = SimpleNamespace(text="sjsjjjs")
+            await auto_filter(client, msg)
+       except Exception as e:
+            await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
 
 
     elif data.split("-", 1)[0] == "verify":
