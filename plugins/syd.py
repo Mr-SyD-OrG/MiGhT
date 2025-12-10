@@ -148,7 +148,7 @@ async def new_file(client, file_name: str):
 
             m = await client.send_message(SYD_UPDATE, txt, reply_markup=button)
 
-            await update_db.save({
+            await db.save({
                 "key": key,
                 "name": name,
                 "season": season,
