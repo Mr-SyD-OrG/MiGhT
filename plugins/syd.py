@@ -8,7 +8,7 @@ from pyrogram.errors import FloodWait
 from pyrogram.errors.exceptions.bad_request_400 import ChannelInvalid, ChatAdminRequired, UsernameInvalid, UsernameNotModified
 from database.ia_filterdb import save_file
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from database.users_chats_db import db
 # Configure logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
