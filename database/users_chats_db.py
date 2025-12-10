@@ -47,6 +47,19 @@ class Database:
         self.all = self.db.filed
         self.words = self.db.words
         self.chnl = self.db.chnl
+        self.updates = self.db.updates
+
+
+
+    async def get(self, key):
+        return await self.updates.find_one({"key": key})
+
+    async def save(self, data):
+        await self.updates.insert_one(data)
+
+    async def update(self, key, update):
+        await self.updates.update_one({"key": key}, {"$set": update})
+
 
 
 
