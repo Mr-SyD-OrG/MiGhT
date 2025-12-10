@@ -335,7 +335,7 @@ async def start(client, message):
             name = data.split("-", 1)[1].replace("_", " ")
             msg = SimpleNamespace(text="sjsjjjs")
             await auto_filter(client, msg)
-       except Exception as e:
+        except Exception as e:
             await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
 
 
