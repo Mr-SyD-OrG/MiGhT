@@ -203,7 +203,7 @@ async def new_file(client, file_name: str):
             button = InlineKeyboardMarkup(
                 [[InlineKeyboardButton(
                     "🔎 Search",
-                    url=f"https://t.me/{temp.U_NAME}?start=search_{search_key}"
+                    url=f"https://t.me/{temp.U_NAME}?start=search-{search_key}"
                 )]]
             )
 
@@ -241,7 +241,7 @@ async def new_file(client, file_name: str):
             button = InlineKeyboardMarkup(
                 [[InlineKeyboardButton(
                     "🔎 Search",
-                    url=f"https://t.me/{temp.U_NAME}?start=search_{search_key}"
+                    url=f"https://t.me/{temp.U_NAME}?start=search-{search_key}"
                 )]]
             )
 
@@ -293,7 +293,7 @@ async def new_file(client, file_name: str):
         button = InlineKeyboardMarkup(
             [[InlineKeyboardButton(
                 "🔎 Search",
-                url=f"https://t.me/{temp.U_NAME}?start=search_{search_key}"
+                url=f"https://t.me/{temp.U_NAME}?start=search-{search_key}"
             )]]
         )
 
