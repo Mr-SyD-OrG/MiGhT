@@ -351,7 +351,7 @@ async def start(client, message):
         try:
             name = data.split("-", 1)[1].replace("_", " ")
             await auto_filter(client, name, False, message.from_user.id)
-            fake_msg = fake_message_from_text(name, message.chat.id, message.from_user.id)
+            fake_msg = fake_message_from_text(name, message.chat.id, message.from_user.id, client)
             await auto_filter(client, fake_msg)
         except Exception as e:
             await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
