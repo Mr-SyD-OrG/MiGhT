@@ -233,7 +233,7 @@ async def new_file(client, file_name: str):
         if ep < start:
             new_start = ep
             search_key = f"{name} S{season}".replace(" ", "_")
-            btn = InlineKeyboardMarkup([[InlineKeyboardButton("🔎 Search", url=f"https://t.me/{temp.U_NAME}?start=search_{search_key}")]])
+            btn = InlineKeyboardMarkup([[InlineKeyboardButton("🔎 Search", url=f"https://t.me/{temp.U_NAME}?start=search-{search_key}")]])
             new_txt = f"{name} S{season}\nE{new_start:02d}-E{old_last:02d}\n🔊 {language}"
 
             try:
