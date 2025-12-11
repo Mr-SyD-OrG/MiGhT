@@ -350,8 +350,7 @@ async def start(client, message):
     elif data.split("-", 1)[0] == "search":
         try:
             name = data.split("-", 1)[1].replace("_", " ")
-            fake_msg = fake_message_from_text(name, message.chat.id, message.from_user.id, client)
-            await auto_filter(client, fake_msg)
+            await auto_filter(client, name, False, message.from_user.id)
         except Exception as e:
             await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
 
