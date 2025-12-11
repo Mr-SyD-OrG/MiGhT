@@ -227,30 +227,36 @@ async def new_file(client, file_name: str):
             })
             return
 
-        # ✅ NEXT EPISODES → EDIT ONLY IF < 24 HOURS
         start = prev["start_ep"]
         old_last = prev["last_ep"]
         created_at = prev.get("created_at", now)
+        if ep < start:
+            new_start = ep
+            search_key = f"{name} S{season}".replace(" ", "_")
+            btn = InlineKeyboardMarkup([[InlineKeyboardButton("🔎 Search", url=f"https://t.me/{temp.U_NAME}?start=search_{search_key}")]])
+            new_txt = f"{name} S{season}\nE{new_start:02d}-E{old_last:02d}\n🔊 {language}"
 
+            try:
+                await client.edit_message_text(SYD_UPDATE, prev["msg_id"], new_txt, reply_markup=btn)
+                await db.update(key, {"start_ep": new_start})
+            except:
+                m = await client.send_message(SYD_UPDATE, new_txt, reply_markup=btn)
+                await db.update(key, {"msg_id": m.id, "start_ep": new_start})
+                return
         if ep > old_last:
-
-            can_edit = (now - created_at) < 86400   # ✅ 24 HOURS
-
+            can_edit = (now - created_at) < 86400
             search_key = f"{name} S{season}".replace(" ", "_").replace("-", "")
-
             button = InlineKeyboardMarkup(
                 [[InlineKeyboardButton(
                     "🔎 Search",
                     url=f"https://t.me/{temp.U_NAME}?start=search-{search_key}"
                 )]]
             )
-
             new_txt = (
                 f"{name} S{season}\n"
                 f"E{str(start).zfill(2)}-E{str(ep).zfill(2)}\n"
                 f"🔊 {language}"
             )
-
             if can_edit:
                 await client.edit_message_text(
                     SYD_UPDATE,
@@ -271,39 +277,29 @@ async def new_file(client, file_name: str):
             })
             return
 
-        return  # ✅ Duplicate episode ignored
+        return  
 
-    # ---------------- ✅ MOVIE DETECT ----------------
     m_match = re.search(r"(?P<title>.*?)(19\d{2}|20\d{2})", clean)
-
     if m_match:
         raw_movie = m_match.group(0).replace("-", " ")
         movie_name = clean_title(raw_movie)
-
         key = movie_name.lower().replace("-", "")
-
         prev = await db.get(key)
-
         # ✅ RESEND IF LANGUAGE CHANGED
         if prev and prev.get("language") == language:
             return
-
         search_key = movie_name.replace(" ", "_").replace("-", "")
-
         button = InlineKeyboardMarkup(
             [[InlineKeyboardButton(
                 "🔎 Search",
                 url=f"https://t.me/{temp.U_NAME}?start=search-{search_key}"
             )]]
         )
-
         txt = (
             f"{movie_name}\n"
             f"🔊 {language}"
         )
-
         await client.send_message(SYD_UPDATE, txt, reply_markup=button)
-
         await db.save({
             "key": key,
             "type": "movie",
