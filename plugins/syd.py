@@ -255,7 +255,7 @@ async def new_file(client, file_name: str):
             new_txt = (
                 f"{name} S{season}\n"
                 f"E{str(start).zfill(2)}-E{str(ep).zfill(2)}\n"
-                f"🔊 {language}"
+                f"<blockquote>🔊 {language}</blockquote>"
             )
             if can_edit:
                 await client.edit_message_text(
