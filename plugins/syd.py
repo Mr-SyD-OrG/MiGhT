@@ -208,7 +208,7 @@ async def new_file(client, file_name: str):
             )
 
             txt = (
-                f"{name.translate(str.maketrans({'a':'@','b':'᥇','e':'ꫀ','s':'﹩','x':'×'}))}\n"
+                f"{name.translate(str.maketrans({'a':'ᴀ','b':'ʙ','e':'ꫀ','s':'ꜱ','x':'x'}))}\n"
                 f"S{season}E{str(ep).zfill(2)}\n"
                 f"<blockquote>🔊 {language}</blockquote>"
             )
@@ -296,7 +296,7 @@ async def new_file(client, file_name: str):
             )]]
         )
         txt = (
-            f"{movie_name.translate(str.maketrans({'a':'@','b':'᥇','e':'ꫀ','s':'﹩','x':'×'}))}\n"
+            f"{movie_name.translate(str.maketrans({'a':'ᴀ','b':'ʙ','e':'ꫀ','s':'ꜱ','x':'x'}))}\n"
             f"<blockquote>🔊 {language}</blockquote>"
         )
         await client.send_message(SYD_UPDATE, txt, reply_markup=button)
