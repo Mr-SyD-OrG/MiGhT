@@ -208,9 +208,9 @@ async def new_file(client, file_name: str):
             )
 
             txt = (
-                f"{name}\n"
+                f"{name.translate(str.maketrans({'a':'@','b':'᥇','e':'ꫀ','s':'﹩','x':'×'}))}\n"
                 f"S{season}E{str(ep).zfill(2)}\n"
-                f"🔊 {language}"
+                f"<blockquote>🔊 {language}</blockquote>"
             )
 
             m = await client.send_message(SYD_UPDATE, txt, reply_markup=button)
@@ -234,7 +234,7 @@ async def new_file(client, file_name: str):
             new_start = ep
             search_key = f"{name} S{season}".replace(" ", "_")
             btn = InlineKeyboardMarkup([[InlineKeyboardButton("🔎 Search", url=f"https://t.me/{temp.U_NAME}?start=search-{search_key}")]])
-            new_txt = f"{name} S{season}\nE{new_start:02d}-E{old_last:02d}\n🔊 {language}"
+            new_txt = f"{name} S{season}\nE{new_start:02d}-E{old_last:02d}\n<blockquote>🔊 {language}</blockquote>"
 
             try:
                 await client.edit_message_text(SYD_UPDATE, prev["msg_id"], new_txt, reply_markup=btn)
@@ -296,7 +296,7 @@ async def new_file(client, file_name: str):
             )]]
         )
         txt = (
-            f"{movie_name}\n"
+            f"{movie_name.translate(str.maketrans({'a':'@','b':'᥇','e':'ꫀ','s':'﹩','x':'×'}))}\n"
             f"🔊 {language}"
         )
         await client.send_message(SYD_UPDATE, txt, reply_markup=button)
