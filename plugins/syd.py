@@ -297,7 +297,7 @@ async def new_file(client, file_name: str):
         )
         txt = (
             f"{movie_name.translate(str.maketrans({'a':'@','b':'᥇','e':'ꫀ','s':'﹩','x':'×'}))}\n"
-            f"🔊 {language}"
+            f"<blockquote>🔊 {language}</blockquote>"
         )
         await client.send_message(SYD_UPDATE, txt, reply_markup=button)
         await db.save({
