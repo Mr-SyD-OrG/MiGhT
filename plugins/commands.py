@@ -85,6 +85,7 @@ async def start(client, message):
         try:
             is_sub = await is_subscribed(client, message)
             if not is_sub:
+                btn = []
                 if not is_sub:
                     btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ¹⊛", url=f"https://t.me/{FSUB_UNAME}")])
                     
@@ -99,13 +100,15 @@ async def start(client, message):
                     chat_id=message.from_user.id,
                     text="<b>Jᴏɪɴ Oᴜʀ Uᴘᴅᴀᴛᴇꜱ Cʜᴀɴɴᴇʟ</b> Aɴᴅ Tʜᴇɴ Cʟɪᴄᴋ Oɴ Tʀʏ Aɢᴀɪɴ Tᴏ Gᴇᴛ Yᴏᴜʀ Rᴇǫᴜᴇꜱᴛᴇᴅ Fɪʟᴇ.",
                     reply_markup=InlineKeyboardMarkup(btn),
-                   parse_mode=enums.ParseMode.HTML
+                    parse_mode=enums.ParseMode.HTML
                 )
                 return
             name = data.split("-", 1)[1].replace("_", " ")
             await auto_filter(client, name, False, message.from_user.id)
         except Exception as e:
             await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
+            name = data.split("-", 1)[1].replace("_", " ")
+            await auto_filter(client, name, False, message.from_user.id)
             
     if AUTH_CHANNEL:
         try:
