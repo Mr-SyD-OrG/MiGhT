@@ -80,6 +80,33 @@ async def start(client, message):
     except:
         file_id = data
         pre = ""
+
+    if data.split("-", 1)[0] == "search":
+        try:
+            is_sub = await is_subscribed(client, message)
+            if not is_sub:
+                if not is_sub:
+                    btn.append([InlineKeyboardButton("⊛ Jᴏɪɴ Uᴘᴅᴀᴛᴇꜱ CʜᴀɴɴᴇL ¹⊛", url=f"https://t.me/{FSUB_UNAME}")])
+                    
+                if len(message.command) > 1 and message.command[1] != "subscribe":
+                    try:
+                        kk, file_id = message.command[1].split("_", 1)
+                        btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", callback_data=f"checksub#{kk}#{file_id}")])
+                    except (IndexError, ValueError):
+                        btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ ↻", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
+
+                sydback = await client.send_message(
+                    chat_id=message.from_user.id,
+                    text="<b>Jᴏɪɴ Oᴜʀ Uᴘᴅᴀᴛᴇꜱ Cʜᴀɴɴᴇʟ</b> Aɴᴅ Tʜᴇɴ Cʟɪᴄᴋ Oɴ Tʀʏ Aɢᴀɪɴ Tᴏ Gᴇᴛ Yᴏᴜʀ Rᴇǫᴜᴇꜱᴛᴇᴅ Fɪʟᴇ.",
+                    reply_markup=InlineKeyboardMarkup(btn),
+                   parse_mode=enums.ParseMode.HTML
+                )
+                return
+            name = data.split("-", 1)[1].replace("_", " ")
+            await auto_filter(client, name, False, message.from_user.id)
+        except Exception as e:
+            await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
+            
     if AUTH_CHANNEL:
         try:
             # Fetch subscription statuses once
@@ -329,14 +356,6 @@ async def start(client, message):
                     continue
             await asyncio.sleep(1) 
         return await sts.delete()
-
-    elif data.split("-", 1)[0] == "search":
-        try:
-            name = data.split("-", 1)[1].replace("_", " ")
-            await auto_filter(client, name, False, message.from_user.id)
-        except Exception as e:
-            await client.send_message(chat_id=1733124290, text=f"ERROR ......  CHECK LOGS {e}")
-
 
     elif data.split("-", 1)[0] == "verify":
         userid = data.split("-", 2)[1]
