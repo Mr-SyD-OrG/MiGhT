@@ -205,9 +205,9 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             # vnay == 1 : already saved (duplicate)
             # vnay == 2 : error
             try:
-                if vnay == 0:
+                if vnay == 1:
                     total_files += 1
-                elif vnay == 1:
+                elif vnay == 0:
                     duplicate += 1
                 elif vnay == 2:
                     errors += 1
