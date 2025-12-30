@@ -272,7 +272,7 @@ async def get_poster(query, bulk=False, id=False, file=None):
 
 
 
-def get_names_by_year(year: int, limit: int = 1000):
+def get_names_by_year(year: int, limit: int = 10000):
     results = imdb.search_movie_advanced(
         release_date=f"{year}-01-01,{year}-12-31",
         sort="moviemeter,desc"
