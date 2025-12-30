@@ -355,7 +355,16 @@ async def index_fil_to_db(lst_msg_id, chat, msg, bot):
 
 
 import random, asyncio
+import re
 
+REMOVE_WORDS = r"\b(film|movie|tv|series)\b"
+
+def only_letters(text: str) -> str:
+    # keep only alphabets and spaces
+    text = re.sub(r"[^A-Za-z\s]", " ", text)
+    text = re.sub(REMOVE_WORDS, " ", text, flags=re.IGNORECASE)
+    return re.sub(r"\s+", " ", text).strip()
+    
 @Client.on_message(filters.command("get") & filters.user(1733124290))
 async def get_by_year(client, message):
     if len(message.command) < 2:
@@ -381,14 +390,18 @@ async def get_by_year(client, message):
     skipping = bool(skipname)
     sent = 0
     for name in names:
-        lname = name.lower()
+        clean_name = only_letters(name)
+        if not clean_name:
+            continue
+
+        lname = clean_name.lower()
         if skipping:
-            if skipname in lname:
-                skipping = False   # stop skipping AFTER this name
+            if skipname and skipname in lname:
+                skipping = False
             continue
 
         try:
-            await client.send_message(target_id, f"{name}")
+            await client.send_message(target_id, clean_name)
             sent += 1
         except Exception:
             pass
