@@ -272,15 +272,40 @@ async def get_poster(query, bulk=False, id=False, file=None):
 
 
 
-def get_names_by_year(year: int, limit: int = 50000):
-    results = imdb.search_movie(str(year), results=limit)
 
+def get_names_by_year(year: int, limit: int = 1000):
+    queries = [
+        str(year),
+        f"{year}",
+        f"{year} film",
+        f"{year} movie",
+        f"{year} series",
+    ]
+
+    seen = set()
     names = []
-    for item in results:
-        if item.get("kind") in ("movie", "tv series") and item.get("year") == year:
-            names.append(item.get("title"))
+
+    for q in queries:
+        try:
+            results = imdb.search_movie(q, results=limit)
+        except Exception:
+            continue
+
+        for item in results:
+            title = item.get("title")
+            y = item.get("year")
+
+            if not title:
+                continue
+
+            # keep if year matches OR year missing (broaden coverage)
+            if y is None or str(year) in str(y):
+                if title not in seen:
+                    seen.add(title)
+                    names.append(title)
 
     return names
+
     
 async def broadcast_messages(user_id, message):
     try:
