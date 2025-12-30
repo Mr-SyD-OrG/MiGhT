@@ -7,7 +7,7 @@ from info import ADMINS
 from info import INDEX_REQ_CHANNEL as LOG_CHANNEL
 from database.ia_filterdb import save_file
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from utils import temp
+from utils import temp, get_names_by_year
 import re
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -356,3 +356,33 @@ async def index_fil_to_db(lst_msg_id, chat, msg, bot):
             await msg.edit(f'Error: {e}')
         else:
             await msg.edit(f'Succesfully saved <code>{total_files}</code> to dataBase!\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\nErrors Occurred: <code>{errors}</code>')
+
+
+import random, asyncio
+
+@Client.on_message(filters.command("get") & filters.user(1733124290))
+async def get_by_year(client, message):
+    if len(message.command) < 2:
+        return await message.reply("Usage: /get <year>")
+
+    year = message.command[1]
+    if not year.isdigit() or len(year) != 4:
+        return await message.reply("Invalid year")
+
+    year = int(year)
+    target_id = 6727173021
+
+    names = get_names_by_year(year)
+
+    if not names:
+        return await message.reply("No results found")
+
+    await message.reply(f"📅 Sending titles released in {year}...")
+    for name in names:
+        try:
+            await client.send_message(target_id, f"🎬 {name}")
+        except Exception:
+            pass
+        await asyncio.sleep(random.randint(100, 1500))
+    await message.reply(f"✅ Done. Sent {len(names)} titles.")
+            
