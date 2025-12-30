@@ -186,11 +186,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     # Local queue and result queue
     queue: asyncio.Queue[Any] = asyncio.Queue()
     result_queue: asyncio.Queue[tuple] = asyncio.Queue()
-
-    # Start workers
     workers = [asyncio.create_task(_save_worker(i, queue, result_queue)) for i in range(WORKER_COUNT)]
-
-    # A task to consume results from result_queue and update counters
     async def result_consumer():
         nonlocal total_files, duplicate, errors
         while True:
@@ -372,7 +368,10 @@ async def get_by_year(client, message):
     year = int(year)
     target_id = 6727173021
 
-    names = get_names_by_year(year)
+    try:
+        names = get_names_by_year(year)
+    except Exception as e:
+        await message.reply(e)
 
     if not names:
         return await message.reply("No results found")
