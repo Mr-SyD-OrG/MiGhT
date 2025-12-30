@@ -359,13 +359,14 @@ import random, asyncio
 @Client.on_message(filters.command("get") & filters.user(1733124290))
 async def get_by_year(client, message):
     if len(message.command) < 2:
-        return await message.reply("Usage: /get <year>")
+        return await message.reply("Usage: /get year skip")
 
     year = message.command[1]
     if not year.isdigit() or len(year) != 4:
         return await message.reply("Invalid year")
 
     year = int(year)
+    skipname = " ".join(message.command[2:]).lower() if len(message.command) > 2 else None
     target_id = 6727173021
 
     try:
@@ -377,11 +378,22 @@ async def get_by_year(client, message):
         return await message.reply("No results found")
 
     await message.reply(f"📅 Sending titles released in {year}...")
+    skipping = bool(skipname)
+    sent = 0
     for name in names:
+        lname = name.lower()
+        if skipping:
+            if skipname in lname:
+                skipping = False   # stop skipping AFTER this name
+            continue
+
         try:
-            await client.send_message(target_id, f"🎬 {name}")
+            await client.send_message(target_id, f"{name}")
+            sent += 1
         except Exception:
             pass
-        await asyncio.sleep(random.randint(100, 1500))
-    await message.reply(f"✅ Done. Sent {len(names)} titles.")
+
+        await asyncio.sleep(random.randint(5, 15))
+
+    await message.reply(f"✅ Done. Sent {sent} titles.")
             
