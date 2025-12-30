@@ -270,6 +270,23 @@ async def get_poster(query, bulk=False, id=False, file=None):
     }
 # https://github.com/odysseusmax/animated-lamp/blob/2ef4730eb2b5f0596ed6d03e7b05243d93e3415b/bot/utils/broadcast.py#L37
 
+
+
+def get_names_by_year(year: int, limit: int = 1000):
+    results = imdb.search_movie_advanced(
+        release_date=f"{year}-01-01,{year}-12-31",
+        sort="moviemeter,desc"
+    )
+
+    names = []
+    for item in results[:limit]:
+        if item.get("kind") in ("movie", "tv series"):
+            title = item.get("title")
+            y = item.get("year")
+            names.append(f"{title} {y}")
+
+    return names
+    
 async def broadcast_messages(user_id, message):
     try:
         await message.copy(chat_id=user_id)
