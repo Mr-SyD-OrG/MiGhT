@@ -13,6 +13,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 lock = asyncio.Lock()
 
+@Client.on_message(filters.command("user") & filters.private)
+async def user_cmd(c,m):
+    r=await c.ask(m.chat.id,"Send user id")
+    if not r.text.isdigit(): return
+    await m.reply("Done",reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("User",user_id=int(r.text))]]))
+    
 
 @Client.on_callback_query(filters.regex(r'^index'))
 async def index_files(bot, query):
